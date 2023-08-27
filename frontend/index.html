@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Moj API Primer</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<body>
+  <div class="container mt-4">
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addUserModal">
+      Add New User
+    </button>
+  </div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Phone Number</th>
+        <th>Gender</th>
+        <th>Age</th>
+        <th>Email</th>
+        <th>Date of Birth</th>
+        <th>City</th>
+        <th>Country</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="dataDisplay"></tbody>
+  </table>
+  <nav aria-label="User pagination">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" id="prevButton">
+        <a class="page-link" href="#" onclick="prevPage()" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item" id="nextButton">
+        <a class="page-link" href="#" onclick="nextPage()" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="addUserForm">
+            <div class="form-group">
+              <label for="firstName">First Name</label>
+              <input type="text" class="form-control" id="firstName" required>
+            </div>
+            <div class="form-group">
+              <label for="lastName">Last Name</label>
+              <input type="text" class="form-control" id="lastName" required>
+            </div>
+            <div class="form-group">
+              <label for="phoneNumber">Phone Number</label>
+              <input type="text" class="form-control" id="phoneNumber" required>
+            </div>
+            <div class="form-group">
+              <label for="gender">Gender</label>
+              <select class="form-control" id="gender" required>
+                <option value="0">Male</option>
+                <option value="1">Female</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input type="email" class="form-control" id="email" required>
+            </div>
+            <div class="form-group">
+              <label for="dateOfBirth">Date of Birth</label>
+              <input type="date" class="form-control" id="dateOfBirth" required>
+            </div>
+            <div class="form-group">
+              <label for="age">Age</label>
+              <input type="number" class="form-control" id="age" required>
+            </div>
+            <div class="form-group">
+              <label for="country">Country</label>
+              <select class="form-control" id="country" onchange="onCountryChange()" required>
+                <option value="">Select a Country</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="city">City</label>
+              <select class="form-control" id="city" disabled required>
+                <option value="">Select a City</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="submit" form="addUserForm" class="btn btn-primary">Add User</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteConfirmationModalLabel">Potvrda brisanja korisnika</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          Da li ste sigurni da želite da izbrišete ovog korisnika?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal" id="declineButton">Ne</button>
+          <button type="button" class="btn btn-danger" id="confirmDeleteButton">Da</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="editUserForm">
+            <input type="hidden" id="editUserId">
+            <div class="form-group">
+              <label for="editFirstName">First Name</label>
+              <input type="text" class="form-control" id="editFirstName" required>
+            </div>
+            <div class="form-group">
+              <label for="editLastName">Last Name</label>
+              <input type="text" class="form-control" id="editLastName" required>
+            </div>
+            <div class="form-group">
+              <label for="editPhoneNumber">Phone Number</label>
+              <input type="text" class="form-control" id="editPhoneNumber" required>
+            </div>
+            <div class="form-group">
+              <label for="editGender">Gender</label>
+              <select class="form-control" id="editGender" required>
+                <option value="0">Male</option>
+                <option value="1">Female</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="editEmail">Email</label>
+              <input type="email" class="form-control" id="editEmail" required>
+            </div>
+            <div class="form-group">
+              <label for="editDateOfBirth">Date of Birth</label>
+              <input type="date" class="form-control" id="editDateOfBirth" required>
+            </div>
+            <div class="form-group">
+              <label for="editAge">Age</label>
+              <input type="number" class="form-control" id="editAge" required>
+            </div>
+            <div class="form-group">
+              <label for="editCountry">Country</label>
+              <select class="form-control" id="editCountry" onchange="onCountryChange2()" required>
+                <option value="">Select a Country</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="editCity">City</label>
+              <select class="form-control" id="editCity" required>
+                <option value="">Select a City</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="saveEditedUser()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>

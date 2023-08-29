@@ -214,8 +214,10 @@ function validateForm() {
 }
 
 function saveEditedUser() {
+
+  const successMessageEdit = document.getElementById("successMessageEdit");
   if (!validateForm()) {
-    return; // Prekini ako forma nije validna
+    return; 
   }
   const userId = document.getElementById("editUserId").value;
   var genderToString = document.getElementById("editGender").value;
@@ -249,10 +251,13 @@ function saveEditedUser() {
   })
     .then((response) => response.json())
     .then((data) => {
+      successMessageEdit.textContent = "User added successfully!";
+      successMessageEdit.style.display = "block";
+      setTimeout(() => {
+        successMessageEdit.style.display = "none";
+      }, "2000");
       $("#editUserModal").modal("hide");
-
       getAllUsers();
-
     })
     .catch((error) => {
       console.error(error);
@@ -456,6 +461,10 @@ document.addEventListener("DOMContentLoaded", function () {
           errorMessageElement.style.display = "none";
           successMessageElement.textContent = "User added successfully!";
           successMessageElement.style.display = "block";
+          setTimeout(() => {
+            $("#addUserModal").modal("hide");
+            successMessageElement.style.display = "none";
+          }, "1000");
           addUserForm.reset();
           getAllUsers();
         }

@@ -1,12 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MyApp.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using MyApp.DTOs;
 using AutoMapper;
 using X.PagedList;
-using X.PagedList.Mvc;
 
 namespace backend.Controllers
 {
@@ -43,6 +40,7 @@ namespace backend.Controllers
                  City = u.City.Name,
                  Country = u.City.Country.Name,
                  DateOfBirth = u.DateOfBirth,
+                 Age = (int)u.Age
 
              })
              .AsQueryable();
@@ -98,6 +96,7 @@ namespace backend.Controllers
                     DateOfBirth = u.DateOfBirth,
                     CityIds = u.CityId,
                     CountryIds = (int)u.CountryId,
+                    Age = (int)u.Age,
                     IsDeleted = u.IsDeleted
                 })
                 .AsQueryable();

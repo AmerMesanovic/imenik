@@ -5,10 +5,18 @@ function getAllUsers(page = 1) {
   currentPage = page;
   const apiUrl = `http://localhost:5095/api/user/getAllUsers?page=${currentPage}&pageSize=${usersPerPage}`;
   fetch(apiUrl)
-    .then((response) => response.json())
+    .then((response) => {
+      if (response.statusText != "OK") {
+        return;
+      }
+      return response.json();
+    })
     .then((data) => {
+      if (data && data.length > 0) {
       const dataDisplay = document.getElementById("dataDisplay");
       dataDisplay.innerHTML = "";
+
+      
       var totalPages = data[0].totalPages
 
       if (totalPages == currentPage) {
@@ -49,9 +57,9 @@ function getAllUsers(page = 1) {
 
         updatePaginationButtons(totalPages, disablePaginateRight, disablePaginateLeft);
       }
-    })
+    }})
     .catch((error) => {
-      console.error("Došlo je do greške prilikom dohvatanja podataka:", error);
+      console.error(error);
     });
 
 }
@@ -93,40 +101,117 @@ function openEditModal(userId) {
       document.getElementById("editFirstName").value = user[0].firstName;
       document.getElementById("editLastName").value = user[0].lastName;
       document.getElementById("editPhoneNumber").value = user[0].phoneNumber;
-      document.getElementById("editGender").value = user[0].gender;
+
+      const genderSelect = document.getElementById("editGender");
+      if (user[0].gender === "Male") {
+        genderSelect.value = "0";
+      } else if (user[0].gender === "Female") {
+        genderSelect.value = "1";
+      }
+
       document.getElementById("editEmail").value = user[0].email;
       document.getElementById("editDateOfBirth").value = user[0].dateOfBirth.split("T")[0];
       document.getElementById("editAge").value = user[0].age;
       document.getElementById("editCity").value = user[0].city;
       document.getElementById("editCountry").value = user[0].country;
-      const countrySelect = document.getElementById("country");
 
+      const editCountrySelect = document.getElementById("editCountry");
+      const selectedCountryId = user[0].countryIds;
+      const selectedCityId = user[0].cityIds;
 
       fetch("http://localhost:5095/api/user/getAllCountries")
         .then((response) => response.json())
         .then((data) => {
-          const editCountrySelect = document.getElementById("editCountry");
-
-          editCountrySelect.innerHTML = '<option value="">Select a Country</option>';
-
+          editCountrySelect.innerHTML = ''; // Očisti opcije
           data.forEach((country) => {
             const option = document.createElement("option");
             option.value = country.id;
             option.textContent = country.name;
             editCountrySelect.appendChild(option);
+            if (country.id == selectedCountryId) {
+              option.selected = true;
+              onCountryChange2(user[0])
+            }
+          
           });
 
-          editCountrySelect.value = user[0].country;
+          $("#editUserModal").modal("show");
         })
-      $("#editUserModal").modal("show");
+        .catch((error) => {
+          console.error( error);
+        });
     })
     .catch((error) => {
-      console.error("Došlo je do greške prilikom dohvatanja korisnika:", error);
+      console.error(error);
     });
 }
 
 
+function validateForm() {
+  const firstName = document.getElementById("editFirstName").value;
+  const lastName = document.getElementById("editLastName").value;
+  const phoneNumber = document.getElementById("editPhoneNumber").value;
+  const email = document.getElementById("editEmail").value;
+  const age = parseInt(document.getElementById("editAge").value);
+
+  let isValid = true;
+
+  // Validacija za ime
+  if (firstName.trim() === "") {
+    document.getElementById("editFirstNameError").textContent = "Unesite ime.";
+    isValid = false;
+  } else {
+    document.getElementById("editFirstNameError").textContent = "";
+  }
+
+  // Validacija za prezime
+  if (lastName.trim() === "") {
+    document.getElementById("editLastNameError").textContent = "Unesite prezime.";
+    isValid = false;
+  } else {
+    document.getElementById("editLastNameError").textContent = "";
+  }
+
+  // Validacija za broj telefona
+  const phoneNumberPattern = /^\d+$/; // Promijenite ovo prema vašim potrebama
+  if (!phoneNumber.match(phoneNumberPattern)) {
+    document.getElementById("editPhoneNumberError").textContent = "Unesite validan broj telefona.";
+    isValid = false;
+  } else {
+    document.getElementById("editPhoneNumberError").textContent = "";
+  }
+
+  // Validacija za email
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email.match(emailPattern)) {
+    document.getElementById("editEmailError").textContent = "Unesite validnu email adresu.";
+    isValid = false;
+  } else {
+    document.getElementById("editEmailError").textContent = "";
+  }
+
+  // Validacija za dob
+  if (isNaN(age) || age <= 0) {
+    document.getElementById("editAgeError").textContent = "Unesite validan broj za dob.";
+    isValid = false;
+  } else {
+    document.getElementById("editAgeError").textContent = "";
+  }
+
+  const selectedCity = document.getElementById("editCity").value;
+  if (selectedCity === "") {
+    document.getElementById("editCityError").textContent = "Izaberite grad.";
+    isValid = false;
+  } else {
+    document.getElementById("editCityError").textContent = "";
+  }
+  return isValid;
+}
+
 function saveEditedUser() {
+  if (!validateForm()) {
+    return; // Prekini ako forma nije validna
+  }
   const userId = document.getElementById("editUserId").value;
   var genderToString = document.getElementById("editGender").value;
   var genderString = "";
@@ -165,40 +250,49 @@ function saveEditedUser() {
 
     })
     .catch((error) => {
-      console.error("Došlo je do greške prilikom uređivanja korisnika:", error);
+      console.error(error);
     });
 }
 
 
-function onCountryChange2() {
+function onCountryChange2(user) {
   const countryId = document.getElementById("editCountry").value;
   const citySelect = document.getElementById("editCity");
-  citySelect.innerHTML = '<option value="">Select a City</option>';
+  citySelect.innerHTML = '<option value="">Izaberite grad</option>';
   if (countryId) {
-    getCitiesById2(countryId);
+    getCitiesById2(countryId, user);
   } else {
     citySelect.disabled = true;
   }
 }
 
 
-function getCitiesById2(id) {
+function getCitiesById2(id, user) {
   const citySelect = document.getElementById("editCity");
   citySelect.disabled = false;
   fetch(`http://localhost:5095/api/user/getCitiesByCountry/${id}`)
     .then((response) => response.json())
     .then((data) => {
-      data.forEach((cities) => {
+      citySelect.innerHTML = '<option value="">Izaberite grad</option>';
+      data.forEach((city) => {
         const option = document.createElement("option");
-        option.value = cities.id;
-        option.textContent = cities.name;
+        option.value = city.id;
+        option.textContent = city.name;
         citySelect.appendChild(option);
       });
+
+      const selectedCityName = user?.cityIds;
+     
+      const cityNames = data.map(city => city.id); 
+      if (cityNames.includes(selectedCityName)) {
+        citySelect.value = selectedCityName;
+      }
     })
     .catch((error) => {
-      console.error("An error occurred while fetching countries:", error);
+      console.error(error);
     });
 }
+
 
 
 function onCountryChange() {
@@ -228,7 +322,7 @@ function getCitiesById(id) {
       });
     })
     .catch((error) => {
-      console.error("An error occurred while fetching countries:", error);
+      console.error(error);
     });
 }
 
@@ -253,18 +347,24 @@ function deleteUser(userId) {
       },
       body: JSON.stringify(userId),
     })
-      .then((response) => response.json())
-      .then((data) => {
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Failed to delete user: ${response.status}`);
+        }
+       
         getAllUsers();
       })
       .catch((error) => {
-        console.error('Došlo je do greške prilikom brisanja korisnika:', error);
+        console.error(error);
+  
+        getAllUsers();
       });
   };
 
   modal.style.display = 'block';
   modal.style.opacity = '1';
 }
+
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -283,7 +383,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     })
     .catch((error) => {
-      console.error("An error occurred while fetching countries:", error);
+      console.error(error);
     });
 
   addUserForm.addEventListener("submit", function (event) {
@@ -324,10 +424,7 @@ document.addEventListener("DOMContentLoaded", function () {
         getAllUsers();
       })
       .catch((error) => {
-        console.error(
-          "Došlo je do greške prilikom dodavanja korisnika:",
-          error
-        );
+        console.error(error);
       });
   });
 });

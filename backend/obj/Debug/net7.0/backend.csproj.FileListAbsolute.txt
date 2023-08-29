@@ -87,8 +87,6 @@
 /home/amer/Documents/Project/imenik/backend/bin/Debug/net7.0/System.Web.WebPages.Razor.dll
 /home/amer/Documents/Project/imenik/backend/bin/Debug/net7.0/System.Web.WebPages.dll
 /home/amer/Documents/Project/imenik/backend/bin/Debug/net7.0/Microsoft.Web.Infrastructure.dll
-/home/amer/Documents/Project/imenik/backend/bin/Debug/net7.0/PagedList.dll
-/home/amer/Documents/Project/imenik/backend/bin/Debug/net7.0/PagedList.Mvc.dll
 /home/amer/Documents/Project/imenik/backend/bin/Debug/net7.0/X.PagedList.dll
 /home/amer/Documents/Project/imenik/backend/bin/Debug/net7.0/X.PagedList.Mvc.dll
 /home/amer/Documents/Project/imenik/backend/bin/Debug/net7.0/X.PagedList.Web.Common.dll

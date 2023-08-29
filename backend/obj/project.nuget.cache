@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "q7q8526HA0a/p7lGT6EpIr1WUanCFtuFHsMk+ZSMF58CaFzDi/v4lAVPP5RLHMU5s0sVPz73kOf4qoDu9viNiQ==",
+  "dgSpecHash": "qk7uYcqIUFewzYJ4L4ULCHF+1a2aMXjhTueewtV9guzAt2X3iQUYWJp0WKeKEGMhh0ShxDZ2w6BAobUnct3wRQ==",
   "success": true,
   "projectFilePath": "/home/amer/Documents/Project/imenik/backend/backend.csproj",
   "expectedPackageFiles": [
@@ -54,6 +54,8 @@
     "/home/amer/.nuget/packages/newtonsoft.json/13.0.3/newtonsoft.json.13.0.3.nupkg.sha512",
     "/home/amer/.nuget/packages/npgsql/7.0.4/npgsql.7.0.4.nupkg.sha512",
     "/home/amer/.nuget/packages/npgsql.entityframeworkcore.postgresql/7.0.4/npgsql.entityframeworkcore.postgresql.7.0.4.nupkg.sha512",
+    "/home/amer/.nuget/packages/pagedlist/1.17.0/pagedlist.1.17.0.nupkg.sha512",
+    "/home/amer/.nuget/packages/pagedlist.mvc/4.5.0/pagedlist.mvc.4.5.0.nupkg.sha512",
     "/home/amer/.nuget/packages/swashbuckle.aspnetcore/6.5.0/swashbuckle.aspnetcore.6.5.0.nupkg.sha512",
     "/home/amer/.nuget/packages/swashbuckle.aspnetcore.swagger/6.5.0/swashbuckle.aspnetcore.swagger.6.5.0.nupkg.sha512",
     "/home/amer/.nuget/packages/swashbuckle.aspnetcore.swaggergen/6.5.0/swashbuckle.aspnetcore.swaggergen.6.5.0.nupkg.sha512",
@@ -128,6 +130,26 @@
       "warningLevel": 1,
       "message": "Package 'Microsoft.Web.Infrastructure 1.0.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net7.0'. This package may not be fully compatible with your project.",
       "libraryId": "Microsoft.Web.Infrastructure",
+      "targetGraphs": [
+        "net7.0"
+      ]
+    },
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'PagedList 1.17.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net7.0'. This package may not be fully compatible with your project.",
+      "libraryId": "PagedList",
+      "targetGraphs": [
+        "net7.0"
+      ]
+    },
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'PagedList.Mvc 4.5.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8, .NETFramework,Version=v4.8.1' instead of the project target framework 'net7.0'. This package may not be fully compatible with your project.",
+      "libraryId": "PagedList.Mvc",
       "targetGraphs": [
         "net7.0"
       ]

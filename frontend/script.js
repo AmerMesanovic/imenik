@@ -3,6 +3,7 @@ const usersPerPage = 5;
 
 function getAllUsers(page = 1) {
   currentPage = page;
+
   const apiUrl = `http://localhost:5095/api/user/getAllUsers?page=${currentPage}&pageSize=${usersPerPage}`;
   fetch(apiUrl)
     .then((response) => {
@@ -12,13 +13,17 @@ function getAllUsers(page = 1) {
       return response.json();
     })
     .then((data) => {
-      if (data && data.length > 0) {
+      console.log(currentPage)
+      if (data === undefined) {
+        const dataDisplay = document.getElementById("dataDisplay");
+        dataDisplay.innerHTML = "";
+      }
+      else if (data && data.length > 0) {
       const dataDisplay = document.getElementById("dataDisplay");
       dataDisplay.innerHTML = "";
 
       
       var totalPages = data[0].totalPages
-
       if (totalPages == currentPage) {
         var disablePaginateRight = true
         var disablePaginateLeft = false
@@ -31,8 +36,8 @@ function getAllUsers(page = 1) {
       }
 
       if (data && data.length > 0) {
+       
         data.forEach((user) => {
-
           const row = document.createElement("tr");
           row.innerHTML = `
           <td>${user.id}</td>
@@ -334,7 +339,7 @@ function deleteUser(userId) {
 
   declineButton.onclick = function () {
     modal.style.display = 'none';
-  }
+  };
 
   confirmButton.onclick = function () {
     modal.style.display = 'none';
@@ -348,15 +353,16 @@ function deleteUser(userId) {
       body: JSON.stringify(userId),
     })
       .then((response) => {
-        if (!response.ok) {
-          throw new Error(`Failed to delete user: ${response.status}`);
+        if (response.status !== 200) {
+          throw new Error(`${response.status}`);
         }
-       
+        return response.json();
+      })
+      .then(() => {
         getAllUsers();
       })
       .catch((error) => {
         console.error(error);
-  
         getAllUsers();
       });
   };
@@ -365,13 +371,30 @@ function deleteUser(userId) {
   modal.style.opacity = '1';
 }
 
+function closeModal(type){
+  const successMessageElementAdd = document.getElementById("successMessage");
+  const errorMessageElementAdd = document.getElementById("errorMessage");
+  const successMessageElementEdit = document.getElementById("successMessageEdit");
+  if(type == "closeAddModal"){
+    $("#addUserModal").modal("hide");
+    errorMessageElementAdd.style.display = "none";
+    successMessageElementAdd.style.display = "none";
+  }
+
+  if(type == "closeEditModal"){
+    $("#addUserModal").modal("hide");
+    successMessageElementEdit.style.display = "none";
+    
+  }
+}
 
 
 document.addEventListener("DOMContentLoaded", function () {
   const addUserForm = document.getElementById("addUserForm");
   const countrySelect = document.getElementById("country");
-
-
+  const errorMessageElement = document.getElementById("errorMessage");
+  const successMessageElement = document.getElementById("successMessage");
+  
   fetch("http://localhost:5095/api/user/getAllCountries")
     .then((response) => response.json())
     .then((data) => {
@@ -418,10 +441,24 @@ document.addEventListener("DOMContentLoaded", function () {
       },
       body: JSON.stringify(newUser),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.status === 200) {
+          // User already exists, show error message
+          return response.text();
+        }
+        return response.json(); // User added successfully
+      })
       .then((data) => {
-        addUserForm.reset();
-        getAllUsers();
+        if (typeof data === "string") {
+          errorMessageElement.textContent = data;
+          errorMessageElement.style.display = "block";
+        } else {
+          errorMessageElement.style.display = "none";
+          successMessageElement.textContent = "User added successfully!";
+          successMessageElement.style.display = "block";
+          addUserForm.reset();
+          getAllUsers();
+        }
       })
       .catch((error) => {
         console.error(error);

@@ -4,6 +4,7 @@ using MyApp.Models;
 using MyApp.DTOs;
 using AutoMapper;
 using X.PagedList;
+using System.Text.Json;
 
 namespace backend.Controllers
 {
@@ -105,25 +106,34 @@ namespace backend.Controllers
         }
 
 
-        [HttpPost("addUser")]
-        public async Task<ActionResult<UserDTO>> AddUser(AddUserDTO userDTO)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var user = _mapper.Map<User>(userDTO);
-
-            user.DateOfBirth = DateTime.SpecifyKind(userDTO.DateOfBirth, DateTimeKind.Utc);
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            var userResponseDTO = _mapper.Map<UserDTO>(user);
-
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, userResponseDTO);
+    [HttpPost("addUser")]
+    public async Task<ActionResult<UserDTO>> AddUser(AddUserDTO userDTO)
+    {
+        if (!ModelState.IsValid){
+            return BadRequest(ModelState);
         }
+
+        var existingEmailUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == userDTO.Email);
+        if (existingEmailUser != null){
+            return StatusCode(200, $"User with email: '{userDTO.Email}' already exists.");
+        }
+
+        var existingPhoneUser = await _context.Users.FirstOrDefaultAsync(u => u.PhoneNumber == userDTO.PhoneNumber);
+        if (existingPhoneUser != null){
+            return StatusCode(200, $"User with phone number: '{userDTO.PhoneNumber}' already exists.");
+        }
+
+        var user = _mapper.Map<User>(userDTO);
+        user.DateOfBirth = DateTime.SpecifyKind(userDTO.DateOfBirth, DateTimeKind.Utc);
+
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+        var userResponseDTO = _mapper.Map<UserDTO>(user);
+
+        return CreatedAtAction(nameof(GetUser), new { id = user.Id }, userResponseDTO);
+    }
+
 
         [HttpPost("editUser/{id}")]
         public async Task<ActionResult<UserDTO>> EditUser(int id, EditUserDTO userDTO)

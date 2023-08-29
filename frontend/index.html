@@ -52,7 +52,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeModal('closeAddModal')">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -102,6 +102,8 @@
               </select>
             </div>
           </form>
+          <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
+          <div id="successMessage" class="alert alert-success" style="display: none;"></div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -137,7 +139,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeModal('closeEditModal')">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
@@ -196,7 +198,7 @@
               <small id="editCityError" class="text-danger"></small>
             </div>
           </form>
-          
+          <div id="successMessage" class="alert alert-success" style="display: none;"></div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>

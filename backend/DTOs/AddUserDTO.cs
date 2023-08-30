@@ -12,5 +12,6 @@ namespace MyApp.DTOs
         public required int CountryId { get; set; }
         public required DateTime DateOfBirth { get; set; }
         public required int Age { get; set; }
+       
     }
 }

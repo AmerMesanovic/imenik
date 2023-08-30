@@ -21,46 +21,33 @@ namespace backend.Controllers
             _context = context;
             _mapper = mapper;
         }
-
-        [HttpGet("getAllUsers")]
+    [HttpGet("getAllUsers")]
         public async Task<ActionResult> GetAllUsers(int page = 1, int pageSize = 5)
         {
             var usersWithLocation = _context.Users
-             .Include(u => u.City)
-             .ThenInclude(c => c.Country)
-             .Where(u => u.IsDeleted == 0)
-             .OrderBy(u => u.Id)
-             .Select(u => new UserDTO
-             {
-                 Id = u.Id,
-                 FirstName = u.FirstName,
-                 LastName = u.LastName,
-                 PhoneNumber = u.PhoneNumber,
-                 Gender = u.Gender.ToString(),
-                 Email = u.Email,
-                 City = u.City.Name,
-                 Country = u.City.Country.Name,
-                 DateOfBirth = u.DateOfBirth,
-                 Age = (int)u.Age
-
-             })
-             .AsQueryable();
+                .Include(u => u.City)
+                .ThenInclude(c => c.Country)
+                .Where(u => u.IsDeleted == 0)
+                .OrderBy(u => u.Id)
+                .AsQueryable();
 
             var totalUsers = await usersWithLocation.CountAsync();
             var totalPages = (int)Math.Ceiling((double)totalUsers / pageSize);
 
             var pagedUsers = await usersWithLocation.ToPagedListAsync(page, pageSize);
 
-            foreach (var user in pagedUsers)
+            var pagedUsersDTO = _mapper.Map<IEnumerable<UserDTO>>(pagedUsers);
+
+            foreach (var user in pagedUsersDTO)
             {
                 user.CurrentPage = page;
                 user.PageSize = pageSize;
                 user.TotalPages = totalPages;
             }
 
-            if (pagedUsers.Any())
+            if (pagedUsersDTO.Any())
             {
-                return Ok(pagedUsers);
+                return Ok(pagedUsersDTO);
             }
             else
             {
@@ -84,24 +71,9 @@ namespace backend.Controllers
                 .ThenInclude(c => c.Country)
                 .Where(u => u.Id == id)
                 .OrderBy(u => u.Id)
-                .Select(u => new UserDTO
-                {
-                    Id = u.Id,
-                    FirstName = u.FirstName,
-                    LastName = u.LastName,
-                    PhoneNumber = u.PhoneNumber,
-                    Gender = u.Gender.ToString(),
-                    Email = u.Email,
-                    City = u.City.Name,
-                    Country = u.City.Country.Name,
-                    DateOfBirth = u.DateOfBirth,
-                    CityIds = u.CityId,
-                    CountryIds = (int)u.CountryId,
-                    Age = (int)u.Age,
-                    IsDeleted = u.IsDeleted
-                })
                 .AsQueryable();
 
+            var userForEditDTO = _mapper.Map<EditUserDTO>(user);
             return Ok(usersWithLocation);
         }
 
@@ -113,12 +85,13 @@ namespace backend.Controllers
             return BadRequest(ModelState);
         }
 
-        var existingEmailUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == userDTO.Email);
-        if (existingEmailUser != null){
+        var existingEmailUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == userDTO.Email && u.IsDeleted == 0);
+        
+        if (existingEmailUser != null ){
             return StatusCode(200, $"User with email: '{userDTO.Email}' already exists.");
         }
 
-        var existingPhoneUser = await _context.Users.FirstOrDefaultAsync(u => u.PhoneNumber == userDTO.PhoneNumber);
+        var existingPhoneUser = await _context.Users.FirstOrDefaultAsync(u => u.PhoneNumber == userDTO.PhoneNumber && u.IsDeleted == 0);
         if (existingPhoneUser != null){
             return StatusCode(200, $"User with phone number: '{userDTO.PhoneNumber}' already exists.");
         }

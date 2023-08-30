@@ -3,3 +3,4 @@
 
 # Ignoriši bin direktorij unutar backend direktorija
 /backend/bin/
+backend/obj/

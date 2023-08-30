@@ -13,7 +13,6 @@ function getAllUsers(page = 1) {
       return response.json();
     })
     .then((data) => {
-      console.log(currentPage)
       if (data === undefined) {
         const dataDisplay = document.getElementById("dataDisplay");
         dataDisplay.innerHTML = "";
@@ -120,15 +119,19 @@ function openEditModal(userId) {
       document.getElementById("editCity").value = user[0].city;
       document.getElementById("editCountry").value = user[0].country;
 
-      const editCountrySelect = document.getElementById("editCountry");
+
+     
+      const editCountrySelect = document.getElementById(`editCountry`);
+
       const selectedCountryId = user[0].countryIds;
       const selectedCityId = user[0].cityIds;
 
       fetch("http://localhost:5095/api/user/getAllCountries")
         .then((response) => response.json())
         .then((data) => {
-          editCountrySelect.innerHTML = ''; // Očisti opcije
+          editCountrySelect.innerHTML = ''; 
           data.forEach((country) => {
+            console.log(country)
             const option = document.createElement("option");
             option.value = country.id;
             option.textContent = country.name;

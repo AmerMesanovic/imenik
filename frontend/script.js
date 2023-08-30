@@ -102,7 +102,6 @@ function openEditModal(userId) {
   fetch(`http://localhost:5095/api/user/edit/${userId}`)
     .then((response) => response.json())
     .then((user) => {
-      console.log(user)
       document.getElementById("editUserId").value = user.id;
       document.getElementById("editFirstName").value = user.firstName;
       document.getElementById("editLastName").value = user.lastName;
@@ -133,7 +132,6 @@ function openEditModal(userId) {
         .then((data) => {
           editCountrySelect.innerHTML = '';
           data.forEach((country) => {
-            console.log(country)
             const option = document.createElement("option");
             option.value = country.id;
             option.textContent = country.name;

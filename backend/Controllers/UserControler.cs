@@ -49,10 +49,9 @@ namespace backend.Controllers
             {
                 return Ok(pagedUsersDTO);
             }
-            else
-            {
+            
                 return NoContent();
-            }
+            
         }
 
 

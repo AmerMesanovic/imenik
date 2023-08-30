@@ -59,22 +59,19 @@ namespace backend.Controllers
         [HttpGet("edit/{id}")]
         public async Task<ActionResult<UserDTO>> GetUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _context.Users
+        .Include(u => u.City)
+        .ThenInclude(c => c.Country)
+        .FirstOrDefaultAsync(u => u.Id == id);
 
-            if (user == null)
-            {
-                return NotFound();
-            }
+    if (user == null)
+    {
+        return NotFound();
+    }
 
-            var usersWithLocation = _context.Users
-                .Include(u => u.City)
-                .ThenInclude(c => c.Country)
-                .Where(u => u.Id == id)
-                .OrderBy(u => u.Id)
-                .AsQueryable();
+    var userDTO = _mapper.Map<UserDTO>(user);
 
-            var userForEditDTO = _mapper.Map<EditUserDTO>(user);
-            return Ok(usersWithLocation);
+    return Ok(userDTO);
         }
 
 

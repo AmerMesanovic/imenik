@@ -18,27 +18,27 @@ function getAllUsers(page = 1) {
         dataDisplay.innerHTML = "";
       }
       else if (data && data.length > 0) {
-      const dataDisplay = document.getElementById("dataDisplay");
-      dataDisplay.innerHTML = "";
+        const dataDisplay = document.getElementById("dataDisplay");
+        dataDisplay.innerHTML = "";
 
-      
-      var totalPages = data[0].totalPages
-      if (totalPages == currentPage) {
-        var disablePaginateRight = true
-        var disablePaginateLeft = false
-      } else if (currentPage == 1) {
-        var disablePaginateRight = false
-        var disablePaginateLeft = true
-      } else {
-        var disablePaginateRight = false
-        var disablePaginateLeft = false
-      }
 
-      if (data && data.length > 0) {
-       
-        data.forEach((user) => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
+        var totalPages = data[0].totalPages
+        if (totalPages == currentPage) {
+          var disablePaginateRight = true
+          var disablePaginateLeft = false
+        } else if (currentPage == 1) {
+          var disablePaginateRight = false
+          var disablePaginateLeft = true
+        } else {
+          var disablePaginateRight = false
+          var disablePaginateLeft = false
+        }
+
+        if (data && data.length > 0) {
+
+          data.forEach((user) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
           <td>${user.id}</td>
           <td>${user.firstName}</td>
           <td>${user.lastName}</td>
@@ -51,17 +51,18 @@ function getAllUsers(page = 1) {
           <td>${user.country}</td>
           <td>
             <button type="button" class="btn btn-primary btn-sm" onclick="openEditModal(${user.id
-            })">Edit</button>
+              })">Edit</button>
             <button type="button" class="btn btn-danger btn-sm" onclick="deleteUser(${user.id
-            })">Delete</button>
+              })">Delete</button>
           </td>
         `;
-          dataDisplay.appendChild(row);
-        });
+            dataDisplay.appendChild(row);
+          });
 
-        updatePaginationButtons(totalPages, disablePaginateRight, disablePaginateLeft);
+          updatePaginationButtons(totalPages, disablePaginateRight, disablePaginateLeft);
+        }
       }
-    }})
+    })
     .catch((error) => {
       console.error(error);
     });
@@ -101,35 +102,36 @@ function openEditModal(userId) {
   fetch(`http://localhost:5095/api/user/edit/${userId}`)
     .then((response) => response.json())
     .then((user) => {
-      document.getElementById("editUserId").value = user[0].id;
-      document.getElementById("editFirstName").value = user[0].firstName;
-      document.getElementById("editLastName").value = user[0].lastName;
-      document.getElementById("editPhoneNumber").value = user[0].phoneNumber;
+      console.log(user)
+      document.getElementById("editUserId").value = user.id;
+      document.getElementById("editFirstName").value = user.firstName;
+      document.getElementById("editLastName").value = user.lastName;
+      document.getElementById("editPhoneNumber").value = user.phoneNumber;
 
       const genderSelect = document.getElementById("editGender");
-      if (user[0].gender === "Male") {
+      if (user.gender === "Male") {
         genderSelect.value = "0";
-      } else if (user[0].gender === "Female") {
+      } else if (user.gender === "Female") {
         genderSelect.value = "1";
       }
 
-      document.getElementById("editEmail").value = user[0].email;
-      document.getElementById("editDateOfBirth").value = user[0].dateOfBirth.split("T")[0];
-      document.getElementById("editAge").value = user[0].age;
-      document.getElementById("editCity").value = user[0].city;
-      document.getElementById("editCountry").value = user[0].country;
+      document.getElementById("editEmail").value = user.email;
+      document.getElementById("editDateOfBirth").value = user.dateOfBirth.split("T")[0];
+      document.getElementById("editAge").value = user.age;
+      document.getElementById("editCity").value = user.city;
+      document.getElementById("editCountry").value = user.country;
 
 
-     
+
       const editCountrySelect = document.getElementById(`editCountry`);
 
-      const selectedCountryId = user[0].countryIds;
-      const selectedCityId = user[0].cityIds;
+      const selectedCountryId = user.countryIds;
+      const selectedCityId = user.cityIds;
 
       fetch("http://localhost:5095/api/user/getAllCountries")
         .then((response) => response.json())
         .then((data) => {
-          editCountrySelect.innerHTML = ''; 
+          editCountrySelect.innerHTML = '';
           data.forEach((country) => {
             console.log(country)
             const option = document.createElement("option");
@@ -138,15 +140,15 @@ function openEditModal(userId) {
             editCountrySelect.appendChild(option);
             if (country.id == selectedCountryId) {
               option.selected = true;
-              onCountryChange2(user[0])
+              onCountryChange2(user)
             }
-          
+
           });
 
           $("#editUserModal").modal("show");
         })
         .catch((error) => {
-          console.error( error);
+          console.error(error);
         });
     })
     .catch((error) => {
@@ -220,7 +222,7 @@ function saveEditedUser() {
 
   const successMessageEdit = document.getElementById("successMessageEdit");
   if (!validateForm()) {
-    return; 
+    return;
   }
   const userId = document.getElementById("editUserId").value;
   var genderToString = document.getElementById("editGender").value;
@@ -295,8 +297,8 @@ function getCitiesById2(id, user) {
       });
 
       const selectedCityName = user?.cityIds;
-     
-      const cityNames = data.map(city => city.id); 
+
+      const cityNames = data.map(city => city.id);
       if (cityNames.includes(selectedCityName)) {
         citySelect.value = selectedCityName;
       }
@@ -379,20 +381,20 @@ function deleteUser(userId) {
   modal.style.opacity = '1';
 }
 
-function closeModal(type){
+function closeModal(type) {
   const successMessageElementAdd = document.getElementById("successMessage");
   const errorMessageElementAdd = document.getElementById("errorMessage");
   const successMessageElementEdit = document.getElementById("successMessageEdit");
-  if(type == "closeAddModal"){
+  if (type == "closeAddModal") {
     $("#addUserModal").modal("hide");
     errorMessageElementAdd.style.display = "none";
     successMessageElementAdd.style.display = "none";
   }
 
-  if(type == "closeEditModal"){
+  if (type == "closeEditModal") {
     $("#addUserModal").modal("hide");
     successMessageElementEdit.style.display = "none";
-    
+
   }
 }
 
@@ -402,7 +404,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const countrySelect = document.getElementById("country");
   const errorMessageElement = document.getElementById("errorMessage");
   const successMessageElement = document.getElementById("successMessage");
-  
+
   fetch("http://localhost:5095/api/user/getAllCountries")
     .then((response) => response.json())
     .then((data) => {

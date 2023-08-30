@@ -1,0 +1,5 @@
+# Ignoriši pdb datoteke
+*.pdb
+
+# Ignoriši bin direktorij unutar backend direktorija
+/backend/bin/

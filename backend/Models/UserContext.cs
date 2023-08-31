@@ -21,11 +21,14 @@ namespace MyApp.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
             modelBuilder.Entity<City>()
                 .HasOne(c => c.Country)
                 .WithMany(co => co.Cities)
                 .HasForeignKey(c => c.CountryId);
+
             base.OnModelCreating(modelBuilder);
         }
+
     }
 }

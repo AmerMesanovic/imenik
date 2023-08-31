@@ -21,7 +21,7 @@ namespace backend.Controllers
             _context = context;
             _mapper = mapper;
         }
-    [HttpGet("getAllUsers")]
+        [HttpGet("getAllUsers")]
         public async Task<ActionResult> GetAllUsers(int page = 1, int pageSize = 5)
         {
             var usersWithLocation = _context.Users
@@ -49,9 +49,9 @@ namespace backend.Controllers
             {
                 return Ok(pagedUsersDTO);
             }
-            
-                return NoContent();
-            
+
+            return NoContent();
+
         }
 
 
@@ -63,45 +63,48 @@ namespace backend.Controllers
         .ThenInclude(c => c.Country)
         .FirstOrDefaultAsync(u => u.Id == id);
 
-    if (user == null)
-    {
-        return NotFound();
-    }
+            if (user == null)
+            {
+                return NotFound();
+            }
 
-    var userDTO = _mapper.Map<UserDTO>(user);
+            var userDTO = _mapper.Map<UserDTO>(user);
 
-    return Ok(userDTO);
+            return Ok(userDTO);
         }
 
 
-    [HttpPost("addUser")]
-    public async Task<ActionResult<UserDTO>> AddUser(AddUserDTO userDTO)
-    {
-        if (!ModelState.IsValid){
-            return BadRequest(ModelState);
+        [HttpPost("addUser")]
+        public async Task<ActionResult<UserDTO>> AddUser(AddUserDTO userDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var existingEmailUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == userDTO.Email && u.IsDeleted == 0);
+
+            if (existingEmailUser != null)
+            {
+                return StatusCode(200, $"User with email: '{userDTO.Email}' already exists.");
+            }
+
+            var existingPhoneUser = await _context.Users.FirstOrDefaultAsync(u => u.PhoneNumber == userDTO.PhoneNumber && u.IsDeleted == 0);
+            if (existingPhoneUser != null)
+            {
+                return StatusCode(200, $"User with phone number: '{userDTO.PhoneNumber}' already exists.");
+            }
+
+            var user = _mapper.Map<User>(userDTO);
+            user.DateOfBirth = DateTime.SpecifyKind(userDTO.DateOfBirth, DateTimeKind.Utc);
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
+            var userResponseDTO = _mapper.Map<UserDTO>(user);
+
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, userResponseDTO);
         }
-
-        var existingEmailUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == userDTO.Email && u.IsDeleted == 0);
-        
-        if (existingEmailUser != null ){
-            return StatusCode(200, $"User with email: '{userDTO.Email}' already exists.");
-        }
-
-        var existingPhoneUser = await _context.Users.FirstOrDefaultAsync(u => u.PhoneNumber == userDTO.PhoneNumber && u.IsDeleted == 0);
-        if (existingPhoneUser != null){
-            return StatusCode(200, $"User with phone number: '{userDTO.PhoneNumber}' already exists.");
-        }
-
-        var user = _mapper.Map<User>(userDTO);
-        user.DateOfBirth = DateTime.SpecifyKind(userDTO.DateOfBirth, DateTimeKind.Utc);
-
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-
-        var userResponseDTO = _mapper.Map<UserDTO>(user);
-
-        return CreatedAtAction(nameof(GetUser), new { id = user.Id }, userResponseDTO);
-    }
 
 
         [HttpPost("editUser/{id}")]

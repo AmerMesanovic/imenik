@@ -1,4 +1,3 @@
-
 const usersPerPage = 5;
 
 function getAllUsers(page = 1) {
@@ -16,26 +15,23 @@ function getAllUsers(page = 1) {
       if (data === undefined) {
         const dataDisplay = document.getElementById("dataDisplay");
         dataDisplay.innerHTML = "";
-      }
-      else if (data && data.length > 0) {
+      } else if (data && data.length > 0) {
         const dataDisplay = document.getElementById("dataDisplay");
         dataDisplay.innerHTML = "";
 
-
-        var totalPages = data[0].totalPages
+        var totalPages = data[0].totalPages;
         if (totalPages == currentPage) {
-          var disablePaginateRight = true
-          var disablePaginateLeft = false
+          var disablePaginateRight = true;
+          var disablePaginateLeft = false;
         } else if (currentPage == 1) {
-          var disablePaginateRight = false
-          var disablePaginateLeft = true
+          var disablePaginateRight = false;
+          var disablePaginateLeft = true;
         } else {
-          var disablePaginateRight = false
-          var disablePaginateLeft = false
+          var disablePaginateRight = false;
+          var disablePaginateLeft = false;
         }
 
         if (data && data.length > 0) {
-
           data.forEach((user) => {
             const row = document.createElement("tr");
             row.innerHTML = `
@@ -50,41 +46,46 @@ function getAllUsers(page = 1) {
           <td>${user.city}</td>
           <td>${user.country}</td>
           <td>
-            <button type="button" class="btn btn-primary btn-sm" onclick="openEditModal(${user.id
-              })">Edit</button>
-            <button type="button" class="btn btn-danger btn-sm" onclick="deleteUser(${user.id
-              })">Delete</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="openEditModal(${
+              user.id
+            })">Edit</button>
+            <button type="button" class="btn btn-danger btn-sm" onclick="deleteUser(${
+              user.id
+            })">Delete</button>
           </td>
         `;
             dataDisplay.appendChild(row);
           });
 
-          updatePaginationButtons(totalPages, disablePaginateRight, disablePaginateLeft);
+          updatePaginationButtons(
+            totalPages,
+            disablePaginateRight,
+            disablePaginateLeft
+          );
         }
       }
     })
     .catch((error) => {
       console.error(error);
     });
-
 }
 
-
-function updatePaginationButtons(totalPages, disablePaginateRight, disablePaginateLeft) {
+function updatePaginationButtons(
+  totalPages,
+  disablePaginateRight,
+  disablePaginateLeft
+) {
   const prevButton = document.getElementById("prevButton");
   const nextButton = document.getElementById("nextButton");
   prevButton.classList.toggle("disabled", disablePaginateLeft);
   nextButton.classList.toggle("disabled", disablePaginateRight);
-
 }
-
 
 function prevPage() {
   if (currentPage > 1) {
     getAllUsers(currentPage - 1);
   }
 }
-
 
 function nextPage() {
   getAllUsers(currentPage + 1);
@@ -96,7 +97,6 @@ function formatDateToDDMMYYYY(inputDate) {
   const year = date.getFullYear();
   return `${day}/${month}/${year}`;
 }
-
 
 function openEditModal(userId) {
   fetch(`http://localhost:5095/api/user/edit/${userId}`)
@@ -115,12 +115,11 @@ function openEditModal(userId) {
       }
 
       document.getElementById("editEmail").value = user.email;
-      document.getElementById("editDateOfBirth").value = user.dateOfBirth.split("T")[0];
+      document.getElementById("editDateOfBirth").value =
+        user.dateOfBirth.split("T")[0];
       document.getElementById("editAge").value = user.age;
       document.getElementById("editCity").value = user.city;
       document.getElementById("editCountry").value = user.country;
-
-
 
       const editCountrySelect = document.getElementById(`editCountry`);
 
@@ -130,7 +129,7 @@ function openEditModal(userId) {
       fetch("http://localhost:5095/api/user/getAllCountries")
         .then((response) => response.json())
         .then((data) => {
-          editCountrySelect.innerHTML = '';
+          editCountrySelect.innerHTML = "";
           data.forEach((country) => {
             const option = document.createElement("option");
             option.value = country.id;
@@ -138,9 +137,8 @@ function openEditModal(userId) {
             editCountrySelect.appendChild(option);
             if (country.id == selectedCountryId) {
               option.selected = true;
-              onCountryChange2(user)
+              onCountryChange2(user);
             }
-
           });
 
           $("#editUserModal").modal("show");
@@ -154,70 +152,7 @@ function openEditModal(userId) {
     });
 }
 
-
-function validateForm() {
-  const firstName = document.getElementById("editFirstName").value;
-  const lastName = document.getElementById("editLastName").value;
-  const phoneNumber = document.getElementById("editPhoneNumber").value;
-  const email = document.getElementById("editEmail").value;
-  const age = parseInt(document.getElementById("editAge").value);
-
-  let isValid = true;
-
-  // Validacija za ime
-  if (firstName.trim() === "") {
-    document.getElementById("editFirstNameError").textContent = "Unesite ime.";
-    isValid = false;
-  } else {
-    document.getElementById("editFirstNameError").textContent = "";
-  }
-
-  // Validacija za prezime
-  if (lastName.trim() === "") {
-    document.getElementById("editLastNameError").textContent = "Unesite prezime.";
-    isValid = false;
-  } else {
-    document.getElementById("editLastNameError").textContent = "";
-  }
-
-  // Validacija za broj telefona
-  const phoneNumberPattern = /^\d+$/; // Promijenite ovo prema vašim potrebama
-  if (!phoneNumber.match(phoneNumberPattern)) {
-    document.getElementById("editPhoneNumberError").textContent = "Unesite validan broj telefona.";
-    isValid = false;
-  } else {
-    document.getElementById("editPhoneNumberError").textContent = "";
-  }
-
-  // Validacija za email
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!email.match(emailPattern)) {
-    document.getElementById("editEmailError").textContent = "Unesite validnu email adresu.";
-    isValid = false;
-  } else {
-    document.getElementById("editEmailError").textContent = "";
-  }
-
-  // Validacija za dob
-  if (isNaN(age) || age <= 0) {
-    document.getElementById("editAgeError").textContent = "Unesite validan broj za dob.";
-    isValid = false;
-  } else {
-    document.getElementById("editAgeError").textContent = "";
-  }
-
-  const selectedCity = document.getElementById("editCity").value;
-  if (selectedCity === "") {
-    document.getElementById("editCityError").textContent = "Izaberite grad.";
-    isValid = false;
-  } else {
-    document.getElementById("editCityError").textContent = "";
-  }
-  return isValid;
-}
-
 function saveEditedUser() {
-
   const successMessageEdit = document.getElementById("successMessageEdit");
   if (!validateForm()) {
     return;
@@ -229,7 +164,7 @@ function saveEditedUser() {
   if (genderToString == 0) {
     genderString = "Male";
   } else if (genderToString == 1) {
-    genderString = "Famale"
+    genderString = "Famale";
   }
 
   const editedUser = {
@@ -267,7 +202,6 @@ function saveEditedUser() {
     });
 }
 
-
 function onCountryChange2(user) {
   const countryId = document.getElementById("editCountry").value;
   const citySelect = document.getElementById("editCity");
@@ -278,7 +212,6 @@ function onCountryChange2(user) {
     citySelect.disabled = true;
   }
 }
-
 
 function getCitiesById2(id, user) {
   const citySelect = document.getElementById("editCity");
@@ -296,7 +229,7 @@ function getCitiesById2(id, user) {
 
       const selectedCityName = user?.cityIds;
 
-      const cityNames = data.map(city => city.id);
+      const cityNames = data.map((city) => city.id);
       if (cityNames.includes(selectedCityName)) {
         citySelect.value = selectedCityName;
       }
@@ -305,8 +238,6 @@ function getCitiesById2(id, user) {
       console.error(error);
     });
 }
-
-
 
 function onCountryChange() {
   const countryId = document.getElementById("country").value;
@@ -319,7 +250,6 @@ function onCountryChange() {
     citySelect.disabled = true;
   }
 }
-
 
 function getCitiesById(id) {
   const citySelect = document.getElementById("city");
@@ -339,24 +269,29 @@ function getCitiesById(id) {
     });
 }
 
-
 function deleteUser(userId) {
-  const modal = document.getElementById('deleteConfirmationModal');
-  const confirmButton = document.getElementById('confirmDeleteButton');
-  const declineButton = document.getElementById('declineButton');
+  const modal = document.getElementById("deleteConfirmationModal");
+  const confirmButton = document.getElementById("confirmDeleteButton");
+  const declineButton = document.getElementById("declineButton");
+  const declineButtonNO = document.getElementById("declineButtonNO");
+  const successMessageDeleted = document.getElementById(
+    "successMessageDeleted"
+  );
 
   declineButton.onclick = function () {
-    modal.style.display = 'none';
+    modal.style.display = "none";
   };
-
+  declineButtonNO.onclick = function () {
+    modal.style.display = "none";
+  };
   confirmButton.onclick = function () {
-    modal.style.display = 'none';
+    modal.style.display = "none";
 
     const apiUrl = `http://localhost:5095/api/user/delete/${userId}`;
     fetch(apiUrl, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(userId),
     })
@@ -367,6 +302,11 @@ function deleteUser(userId) {
         return response.json();
       })
       .then(() => {
+        successMessageDeleted.textContent = "User dedleted successfully!";
+        successMessageDeleted.style.display = "block";
+        setTimeout(() => {
+          successMessageDeleted.style.display = "none";
+        }, "2000");
         getAllUsers();
       })
       .catch((error) => {
@@ -375,14 +315,15 @@ function deleteUser(userId) {
       });
   };
 
-  modal.style.display = 'block';
-  modal.style.opacity = '1';
+  modal.style.display = "block";
+  modal.style.opacity = "1";
 }
 
 function closeModal(type) {
   const successMessageElementAdd = document.getElementById("successMessage");
   const errorMessageElementAdd = document.getElementById("errorMessage");
-  const successMessageElementEdit = document.getElementById("successMessageEdit");
+  const successMessageElementEdit =
+    document.getElementById("successMessageEdit");
   if (type == "closeAddModal") {
     $("#addUserModal").modal("hide");
     errorMessageElementAdd.style.display = "none";
@@ -392,10 +333,8 @@ function closeModal(type) {
   if (type == "closeEditModal") {
     $("#addUserModal").modal("hide");
     successMessageElementEdit.style.display = "none";
-
   }
 }
-
 
 document.addEventListener("DOMContentLoaded", function () {
   const addUserForm = document.getElementById("addUserForm");
@@ -419,7 +358,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   addUserForm.addEventListener("submit", function (event) {
     event.preventDefault();
-
+    if (!validateFormForAddUser()) {
+      return;
+    }
     const firstName = document.getElementById("firstName").value;
     const lastName = document.getElementById("lastName").value;
     const phoneNumber = document.getElementById("phoneNumber").value;
@@ -451,10 +392,9 @@ document.addEventListener("DOMContentLoaded", function () {
     })
       .then((response) => {
         if (response.status === 200) {
-          // User already exists, show error message
           return response.text();
         }
-        return response.json(); // User added successfully
+        return response.json();
       })
       .then((data) => {
         if (typeof data === "string") {
